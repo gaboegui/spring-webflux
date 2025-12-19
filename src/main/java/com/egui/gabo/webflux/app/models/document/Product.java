@@ -5,8 +5,13 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
-@Document(collection = "products")  // in NOSQL replaces @Entity 
+/**
+ * Product entity/document for MongoDB.
+ * Represents a product with name, price, and creation timestamp.
+ * 
+ * @author Gabriel Eguiguren P.
+ */
+@Document(collection = "products")
 public class Product {
 	
 	@Id
@@ -18,9 +23,16 @@ public class Product {
 	
 	private Date createAt;
 	
+	/** Default constructor. */
 	public Product() {
 	}
 
+	/**
+	 * Constructor with name and price.
+	 * 
+	 * @param name Product name
+	 * @param price Product price
+	 */
 	public Product(String name, Double price) {
 		this.name = name;
 		this.price = price;
@@ -57,10 +69,4 @@ public class Product {
 	public void setCreateAt(Date createAt) {
 		this.createAt = createAt;
 	}
-	
-	
-	
-	
-	
-
 }

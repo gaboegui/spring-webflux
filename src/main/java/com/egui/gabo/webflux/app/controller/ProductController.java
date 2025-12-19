@@ -15,6 +15,12 @@ import com.egui.gabo.webflux.app.models.repository.ProductRepository;
 
 import reactor.core.publisher.Flux;
 
+/**
+ * Thymeleaf controller for product views.
+ * Demonstrates various reactive streaming patterns with Thymeleaf templates.
+ * 
+ * @author Gabriel Eguiguren P.
+ */
 @Controller
 public class ProductController {
 	
@@ -23,105 +29,80 @@ public class ProductController {
 	@Autowired
 	private ProductRepository productDao;
 	
+	/**
+	 * Standard product listing with uppercase names.
+	 * Uses default Thymeleaf subscription to Flux.
+	 */
 	@GetMapping("/")
 	public String listarProductos(Model model) {
+		model.addAttribute("title", "Product List");
 		
-		// model to work with thymeleaf
-		model.addAttribute("title","Product List");
-		
-		// Flux<Product> productos = productDao.findAll();
 		Flux<Product> products = productDao.findAll()
-				.map(product-> {
+				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
 				});
 		
-		// add another suscriber to default of thymeleaf
 		products.subscribe(prod -> log.info(prod.getName()));
+		model.addAttribute("products", products);
 		
-		model.addAttribute("products", products);  // thymeleaf by default subscribe() to Flux
-		
-		return "listProducts";  // must match with templates/html file name
+		return "listProducts";
 	} 
 	
-	
 	/**
-
-	 * @param model
-	 * @return
+	 * Large dataset demonstration (500x repeated).
+	 * Tests performance with large reactive streams.
 	 */
 	@GetMapping("/list-huge")
 	public String listarProductosFull(Model model) {
+		model.addAttribute("title", "Product List");
 		
-		// model to work with thymeleaf
-		model.addAttribute("title","Product List");
-		
-		// Flux<Product> productos = productDao.findAll();
 		Flux<Product> products = productDao.findAll()
-				.map(product-> {
+				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
 				})
-				.repeat(500);  // Repeat the existing to increase size
-
+				.repeat(500);
 		
-		model.addAttribute("products", products);  // thymeleaf by default subscribe() to Flux
-		
-		return "listProducts";  // must match with templates/html file name
+		model.addAttribute("products", products);
+		return "listProducts";
 	}
 	
 	/**
-	 * This view uses Contra-presure definition.
-	 * Defined by list in application.properties
-	 * Uses max-chunk-size=1024 defined to send the data chunked
-	 * 
-	 * @param model
-	 * @return
+	 * Chunked response with backpressure.
+	 * Uses max-chunk-size=1024 defined in application.properties.
 	 */
 	@GetMapping("/list-chunked")
 	public String listarProductsChunked(Model model) {
+		model.addAttribute("title", "Product List");
 		
-		// model to work with thymeleaf
-		model.addAttribute("title","Product List");
-		
-		// Flux<Product> productos = productDao.findAll();
 		Flux<Product> products = productDao.findAll()
-				.map(product-> {
+				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
 				})
-				.repeat(500);  // Repeat the existing to increase size
-
+				.repeat(500);
 		
-		model.addAttribute("products", products);  // thymeleaf by default subscribe() to Flux
-		
-		return "list-chunked";  // must match with templates/html file name
+		model.addAttribute("products", products);
+		return "list-chunked";
 	} 
-
-	
 	
 	/**
-	 * Uses ReactiveDataDriverContextVariable to send data partially
-	 * @param model for use in thymeleaf
-	 * @return
+	 * Reactive Data Driver with controlled data flow.
+	 * Sends data in chunks of 2 with 1-second delays between elements.
 	 */
 	@GetMapping("/list")
 	public String listarReactiveDataDriver(Model model) {
+		model.addAttribute("title", "Product List");
 		
-		// model to work with thymeleaf
-		model.addAttribute("title","Product List");
-		
-		// Flux<Product> productos = productDao.findAll();
 		Flux<Product> products = productDao.findAll()
-				.map(product-> {
+				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
 				})
 				.delayElements(Duration.ofSeconds(1));
 		
-		//Send blocks of 2 data until delay completed
-		model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 2));  
-		
-		return "listProducts";  // must match with templates/html file name
+		model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 2));
+		return "listProducts";
 	} 
 }

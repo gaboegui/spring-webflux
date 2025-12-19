@@ -14,6 +14,12 @@ import com.egui.gabo.webflux.app.models.repository.ProductRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * REST controller for product API endpoints.
+ * Demonstrates reactive REST API patterns with Spring WebFlux.
+ * 
+ * @author Gabriel Eguiguren P.
+ */
 @RestController
 @RequestMapping("/api/products")
 public class ProductRestController {
@@ -23,28 +29,35 @@ public class ProductRestController {
 	@Autowired
 	private ProductRepository productDao;
 	
+	/**
+	 * Get all products with names converted to uppercase.
+	 * Returns a Flux stream of products.
+	 */
 	@GetMapping
 	public Flux<Product> listarProductos() {
-		// Flux<Product> productos = productDao.findAll();
 		Flux<Product> products = productDao.findAll()
-				.map(product-> {
+				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
 				})
 				.doOnNext(prod -> log.info(prod.getName()));
 		
-		return products;  // must match with templates/html file name
+		return products;
 	} 
 	
+	/**
+	 * Get a single product by ID.
+	 * Returns a Mono containing the product or empty if not found.
+	 * 
+	 * @param id Product ID
+	 * @return Mono containing the product
+	 */
 	@GetMapping("/{id}")
 	public Mono<Product> listarProducto(@PathVariable String id) {
-		
-		//return productDao.findById(id);
-		
 		Flux<Product> productos = productDao.findAll();
 		Mono<Product> founded = productos
 				.filter(prod -> prod.getId().equals(id))
-				.next();	// return the first	
+				.next();
 		
 		return founded;
 	}
