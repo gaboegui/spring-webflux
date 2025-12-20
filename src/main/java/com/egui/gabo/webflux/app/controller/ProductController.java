@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
 
 import com.egui.gabo.webflux.app.models.document.Product;
@@ -20,8 +24,11 @@ import reactor.core.publisher.Mono;
  * Thymeleaf controller for product views.
  * Demonstrates various reactive streaming patterns with Thymeleaf templates.
  * 
+ * SessionAttributes avoid the use of hidden input to indentify save or update action
+ * 
  * @author Gabriel Eguiguren P.
  */
+@SessionAttributes("product")
 @Controller
 public class ProductController {
 	
@@ -29,6 +36,8 @@ public class ProductController {
 	
 	@Autowired
 	private ProductService productService;
+	
+	
 	
 	/**
 	 * Standard product listing with uppercase names.
@@ -60,6 +69,38 @@ public class ProductController {
 		
 		model.addAttribute("products", products);
 		return Mono.just("listProducts");
+	}
+	
+	@GetMapping("/product-form")
+	public Mono<String> createForm(Model model) {
+
+		model.addAttribute("title", "Product Form");
+		model.addAttribute("buttonText", "Create");
+		model.addAttribute("product", new Product());  	// must match @SessionAttributes
+		return Mono.just("productForm");		
+	}
+
+	@GetMapping("/product-form/{id}")
+	public Mono<String> updateForm(@PathVariable String id, Model model) {
+		
+		Mono<Product> productDb = productService.findById(id)
+				.defaultIfEmpty(new Product());		// avoids error message if not found
+		
+		model.addAttribute("title", "Product Edit");
+		model.addAttribute("buttonText", "Edit");
+		model.addAttribute("product",  productDb); 		// must match @SessionAttributes
+		
+		return Mono.just("productForm");
+	}
+
+	
+	@PostMapping("/product-form")
+	public Mono<String> saveForm(Product product, SessionStatus session) {
+		
+		session.setComplete();  			// destroys the object from @SessionAttributes
+		
+		return productService.save(product)
+				.thenReturn("redirect:/list"); 
 	}
 	
 	/**

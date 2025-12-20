@@ -7,8 +7,10 @@
 </head>
 
 <body>
+	<div th:if="${param.error != null}"  th:text="${param.error}" ></div>
+	
 	<h1 th:text="${title}"></h1>
-
+	<a th:href="@{/product-form}"> New Product</a>
 	<table>
 		<thead>
 			<tr>
@@ -24,6 +26,7 @@
 				<td th:text="${producto.name}"></td>
 				<td th:text="${producto.price}"></td>
 				<td th:text="${producto.createAt}"></td>
+				<td><a th:href="@{/product-form/} + ${producto.id}"> Edit</a></td>
 			</tr>
 		</tbody>
 	</table>

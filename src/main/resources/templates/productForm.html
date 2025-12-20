@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${title}"></title>
+</head>
+
+<body>
+	<h1 th:text="${title}"></h1>
+	<a th:href="@{/list}">Product List</a>
+
+	<!-- Hidden field is an alternative to @SessionAttributes on Controller -->
+	<!-- <input th:if="${product.id != null}" type="hidden" th:field="*{id}"> -->
+	<div>
+	    <form th:action="@{/product-form}" method="post" th:object="${product}">
+	        <div>
+	            <label for="name">Nombre</label>
+	            <div><input type="text" th:field="*{name}"/></div>
+	        </div>
+	        <div>
+	            <label for="price">Precio</label>
+	            <div><input type="number" th:field="*{price}"/></div>
+	        </div>
+	        <div>
+	            <label for="createAt">Fecha</label>
+	            <div><input type="date" th:field="*{createAt}"/></div>
+	        </div>
+	        <div>
+	            <div><input type="submit" th:value="${buttonText}"/></div>
+	        </div>
+	    </form>
+	</div>
+</body>
+
+</html>
