@@ -1,12 +1,14 @@
 package com.egui.gabo.webflux.app.controller;
 
 import java.time.Duration;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,7 @@ import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
 import com.egui.gabo.webflux.app.models.document.Product;
 import com.egui.gabo.webflux.app.service.ProductService;
 
+import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -95,12 +98,25 @@ public class ProductController {
 
 	
 	@PostMapping("/product-form")
-	public Mono<String> saveForm(Product product, SessionStatus session) {
+	public Mono<String> saveForm(@Valid Product product, BindingResult validation, Model model,  SessionStatus session) {
 		
-		session.setComplete();  			// destroys the object from @SessionAttributes
+		if (validation.hasErrors()) {
+			
+			model.addAttribute("title", "Product Edit");
+			model.addAttribute("buttonText", "Save");
+			
+			return Mono.just("productForm");
+			
+		} else {
+			
+			if (product.getCreateAt() == null) {
+				product.setCreateAt(new Date());
+			}
 		
-		return productService.save(product)
-				.thenReturn("redirect:/list"); 
+			session.setComplete();  			// destroys the object from @SessionAttributes
+			return productService.save(product)
+				.thenReturn("redirect:/list?success=Producto+guardado");
+		}
 	}
 	
 	/**

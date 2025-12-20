@@ -6,6 +6,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 /**
  * Product entity/document for MongoDB.
  * Represents a product with name, price, and creation timestamp.
@@ -18,8 +21,10 @@ public class Product {
 	@Id
 	private String id;
 	
+	@NotEmpty
 	private String name;
 	
+	@NotNull	
 	private Double price;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
