@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.spring6.context.webflux.ReactiveDataDriverContextVariable;
 
 import com.egui.gabo.webflux.app.models.document.Product;
-import com.egui.gabo.webflux.app.models.repository.ProductRepository;
+import com.egui.gabo.webflux.app.service.ProductService;
 
 import reactor.core.publisher.Flux;
 
@@ -27,7 +27,7 @@ public class ProductController {
 	private static final Logger log = LoggerFactory.getLogger(ProductController.class);	
 	
 	@Autowired
-	private ProductRepository productDao;
+	private ProductService productService;
 	
 	/**
 	 * Standard product listing with uppercase names.
@@ -37,7 +37,7 @@ public class ProductController {
 	public String listarProductos(Model model) {
 		model.addAttribute("title", "Product List");
 		
-		Flux<Product> products = productDao.findAll()
+		Flux<Product> products = productService.findAll()
 				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
@@ -57,7 +57,7 @@ public class ProductController {
 	public String listarProductosFull(Model model) {
 		model.addAttribute("title", "Product List");
 		
-		Flux<Product> products = productDao.findAll()
+		Flux<Product> products = productService.findAll()
 				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
@@ -76,7 +76,7 @@ public class ProductController {
 	public String listarProductsChunked(Model model) {
 		model.addAttribute("title", "Product List");
 		
-		Flux<Product> products = productDao.findAll()
+		Flux<Product> products = productService.findAll()
 				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
@@ -95,7 +95,7 @@ public class ProductController {
 	public String listarReactiveDataDriver(Model model) {
 		model.addAttribute("title", "Product List");
 		
-		Flux<Product> products = productDao.findAll()
+		Flux<Product> products = productService.findAll()
 				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;

@@ -4,12 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;	
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.egui.gabo.webflux.app.models.document.Product;
-import com.egui.gabo.webflux.app.models.repository.ProductRepository;
+import com.egui.gabo.webflux.app.service.ProductService;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,7 +27,7 @@ public class ProductRestController {
 	private static final Logger log = LoggerFactory.getLogger(ProductRestController.class);	
 	
 	@Autowired
-	private ProductRepository productDao;
+	private ProductService productService;
 	
 	/**
 	 * Get all products with names converted to uppercase.
@@ -35,7 +35,7 @@ public class ProductRestController {
 	 */
 	@GetMapping
 	public Flux<Product> listarProductos() {
-		Flux<Product> products = productDao.findAll()
+		Flux<Product> products = productService.findAll()
 				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
@@ -54,7 +54,10 @@ public class ProductRestController {
 	 */
 	@GetMapping("/{id}")
 	public Mono<Product> listarProducto(@PathVariable String id) {
-		Flux<Product> productos = productDao.findAll();
+		
+		// Mono<Product> founded = productDao.findById(id);
+		
+		Flux<Product> productos = productService.findAll();
 		Mono<Product> founded = productos
 				.filter(prod -> prod.getId().equals(id))
 				.next();

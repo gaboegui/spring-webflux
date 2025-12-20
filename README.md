@@ -7,6 +7,7 @@ A Spring Boot application demonstrating reactive programming with Spring WebFlux
 - **Reactive REST API**: Fully non-blocking REST endpoints using Spring WebFlux
 - **Reactive MongoDB**: Uses Spring Data MongoDB Reactive for database operations
 - **Reactive Thymeleaf Templates**: Server-side rendering with reactive data streaming
+- **Service Layer Architecture**: Clean separation with service interface and implementation
 - **Multiple Data Streaming Patterns**:
   - Standard reactive streaming
   - Chunked response handling with backpressure
@@ -29,6 +30,10 @@ src/main/java/com/egui/gabo/webflux/app/
 ├── controller/
 │   ├── ProductController.java         # Thymeleaf web controller
 │   └── ProductRestController.java     # REST API controller
+├── service/
+│   ├── ProductService.java           # Service interface
+│   └── impl/
+│       └── ProductServiceImpl.java   # Service implementation
 ├── models/
 │   ├── document/
 │   │   └── Product.java              # MongoDB document entity
@@ -117,7 +122,7 @@ Once running, the application will:
 ```java
 @GetMapping("/")
 public String listarProductos(Model model) {
-    Flux<Product> products = productDao.findAll()
+    Flux<Product> products = productService.findAll()
         .map(product -> {
             product.setName(product.getName().toUpperCase());
             return product;
@@ -131,7 +136,7 @@ public String listarProductos(Model model) {
 ```java
 @GetMapping("/list")
 public String listarReactiveDataDriver(Model model) {
-    Flux<Product> products = productDao.findAll()
+    Flux<Product> products = productService.findAll()
         .map(product -> {
             product.setName(product.getName().toUpperCase());
             return product;
@@ -154,7 +159,7 @@ spring.thymeleaf.reactive.chunked-mode-view-names=*chunked*
 ```java
 @GetMapping("/list-huge")
 public String listarProductosFull(Model model) {
-    Flux<Product> products = productDao.findAll()
+    Flux<Product> products = productService.findAll()
         .map(product -> {
             product.setName(product.getName().toUpperCase());
             return product;
@@ -164,6 +169,56 @@ public String listarProductosFull(Model model) {
     return "listProducts";
 }
 ```
+
+## Service Layer Architecture
+
+The application follows a layered architecture with a clear separation of concerns:
+
+### Service Interface (`ProductService.java`)
+```java
+public interface ProductService {
+    public Flux<Product> findAll();
+    public Mono<Product> findById(String id);
+    public Mono<Product> save(Product p);
+    public Mono<Void> delete(Product p);
+}
+```
+
+### Service Implementation (`ProductServiceImpl.java`)
+```java
+@Service
+public class ProductServiceImpl implements ProductService {
+    
+    @Autowired
+    private ProductRepository productDao;
+
+    @Override
+    public Flux<Product> findAll() {
+        return productDao.findAll();
+    }
+
+    @Override
+    public Mono<Product> findById(String id) {
+        return productDao.findById(id);
+    }
+
+    @Override
+    public Mono<Product> save(Product p) {
+        return productDao.save(p);
+    }
+
+    @Override
+    public Mono<Void> delete(Product p) {
+        return productDao.delete(p);
+    }
+}
+```
+
+### Key Benefits
+1. **Separation of Concerns**: Controllers handle HTTP requests/responses, services contain business logic
+2. **Testability**: Services can be easily mocked and tested independently
+3. **Reusability**: Service methods can be reused across different controllers
+4. **Maintainability**: Business logic changes are isolated to the service layer
 
 ## Configuration
 
