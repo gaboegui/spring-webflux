@@ -122,11 +122,7 @@ Once running, the application will:
 ```java
 @GetMapping("/")
 public String listarProductos(Model model) {
-    Flux<Product> products = productService.findAll()
-        .map(product -> {
-            product.setName(product.getName().toUpperCase());
-            return product;
-        });
+    Flux<Product> products = productService.findAll();
     model.addAttribute("products", products);
     return "listProducts";
 }
@@ -136,11 +132,7 @@ public String listarProductos(Model model) {
 ```java
 @GetMapping("/list")
 public String listarReactiveDataDriver(Model model) {
-    Flux<Product> products = productService.findAll()
-        .map(product -> {
-            product.setName(product.getName().toUpperCase());
-            return product;
-        })
+    Flux<Product> products = productService.findAll();
         .delayElements(Duration.ofSeconds(1));
     
     model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 2));
@@ -160,11 +152,8 @@ spring.thymeleaf.reactive.chunked-mode-view-names=*chunked*
 @GetMapping("/list-huge")
 public String listarProductosFull(Model model) {
     Flux<Product> products = productService.findAll()
-        .map(product -> {
-            product.setName(product.getName().toUpperCase());
-            return product;
-        })
         .repeat(500);  // Repeat 500 times for large dataset
+
     model.addAttribute("products", products);
     return "listProducts";
 }
@@ -175,44 +164,9 @@ public String listarProductosFull(Model model) {
 The application follows a layered architecture with a clear separation of concerns:
 
 ### Service Interface (`ProductService.java`)
-```java
-public interface ProductService {
-    public Flux<Product> findAll();
-    public Mono<Product> findById(String id);
-    public Mono<Product> save(Product p);
-    public Mono<Void> delete(Product p);
-}
-```
 
 ### Service Implementation (`ProductServiceImpl.java`)
-```java
-@Service
-public class ProductServiceImpl implements ProductService {
-    
-    @Autowired
-    private ProductRepository productDao;
 
-    @Override
-    public Flux<Product> findAll() {
-        return productDao.findAll();
-    }
-
-    @Override
-    public Mono<Product> findById(String id) {
-        return productDao.findById(id);
-    }
-
-    @Override
-    public Mono<Product> save(Product p) {
-        return productDao.save(p);
-    }
-
-    @Override
-    public Mono<Void> delete(Product p) {
-        return productDao.delete(p);
-    }
-}
-```
 
 ### Key Benefits
 1. **Separation of Concerns**: Controllers handle HTTP requests/responses, services contain business logic

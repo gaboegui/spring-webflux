@@ -36,10 +36,6 @@ public class ProductRestController {
 	@GetMapping
 	public Flux<Product> listarProductos() {
 		Flux<Product> products = productService.findAll()
-				.map(product -> {
-					product.setName(product.getName().toUpperCase());
-					return product;
-				})
 				.doOnNext(prod -> log.info(prod.getName()));
 		
 		return products;
@@ -57,7 +53,7 @@ public class ProductRestController {
 		
 		// Mono<Product> founded = productDao.findById(id);
 		
-		Flux<Product> productos = productService.findAll();
+		Flux<Product> productos = productService.findAllNameUppercase();
 		Mono<Product> founded = productos
 				.filter(prod -> prod.getId().equals(id))
 				.next();

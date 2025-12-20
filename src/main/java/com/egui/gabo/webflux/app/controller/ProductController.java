@@ -37,11 +37,8 @@ public class ProductController {
 	public String listarProductos(Model model) {
 		model.addAttribute("title", "Product List");
 		
-		Flux<Product> products = productService.findAll()
-				.map(product -> {
-					product.setName(product.getName().toUpperCase());
-					return product;
-				});
+		Flux<Product> products = productService.findAllNameUppercase();
+				
 		
 		products.subscribe(prod -> log.info(prod.getName()));
 		model.addAttribute("products", products);
@@ -57,11 +54,7 @@ public class ProductController {
 	public String listarProductosFull(Model model) {
 		model.addAttribute("title", "Product List");
 		
-		Flux<Product> products = productService.findAll()
-				.map(product -> {
-					product.setName(product.getName().toUpperCase());
-					return product;
-				})
+		Flux<Product> products = productService.findAllNameUppercase()
 				.repeat(500);
 		
 		model.addAttribute("products", products);
@@ -76,11 +69,7 @@ public class ProductController {
 	public String listarProductsChunked(Model model) {
 		model.addAttribute("title", "Product List");
 		
-		Flux<Product> products = productService.findAll()
-				.map(product -> {
-					product.setName(product.getName().toUpperCase());
-					return product;
-				})
+		Flux<Product> products = productService.findAllNameUppercase()
 				.repeat(500);
 		
 		model.addAttribute("products", products);
@@ -96,10 +85,6 @@ public class ProductController {
 		model.addAttribute("title", "Product List");
 		
 		Flux<Product> products = productService.findAll()
-				.map(product -> {
-					product.setName(product.getName().toUpperCase());
-					return product;
-				})
 				.delayElements(Duration.ofSeconds(1));
 		
 		model.addAttribute("products", new ReactiveDataDriverContextVariable(products, 2));
