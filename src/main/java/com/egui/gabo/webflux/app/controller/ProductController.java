@@ -14,6 +14,7 @@ import com.egui.gabo.webflux.app.models.document.Product;
 import com.egui.gabo.webflux.app.service.ProductService;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Thymeleaf controller for product views.
@@ -34,7 +35,7 @@ public class ProductController {
 	 * Uses default Thymeleaf subscription to Flux.
 	 */
 	@GetMapping("/")
-	public String listarProductos(Model model) {
+	public Mono<String> listarProductos(Model model) {
 		model.addAttribute("title", "Product List");
 		
 		Flux<Product> products = productService.findAllNameUppercase();
@@ -43,7 +44,7 @@ public class ProductController {
 		products.subscribe(prod -> log.info(prod.getName()));
 		model.addAttribute("products", products);
 		
-		return "listProducts";
+		return Mono.just("listProducts");  // must match name of html file in resources/static
 	} 
 	
 	/**
@@ -51,14 +52,14 @@ public class ProductController {
 	 * Tests performance with large reactive streams.
 	 */
 	@GetMapping("/list-huge")
-	public String listarProductosFull(Model model) {
+	public Mono<String> listarProductosFull(Model model) {
 		model.addAttribute("title", "Product List");
 		
 		Flux<Product> products = productService.findAllNameUppercase()
 				.repeat(500);
 		
 		model.addAttribute("products", products);
-		return "listProducts";
+		return Mono.just("listProducts");
 	}
 	
 	/**
@@ -66,14 +67,14 @@ public class ProductController {
 	 * Uses max-chunk-size=1024 defined in application.properties.
 	 */
 	@GetMapping("/list-chunked")
-	public String listarProductsChunked(Model model) {
+	public Mono<String> listarProductsChunked(Model model) {
 		model.addAttribute("title", "Product List");
 		
 		Flux<Product> products = productService.findAllNameUppercase()
 				.repeat(500);
 		
 		model.addAttribute("products", products);
-		return "list-chunked";
+		return Mono.just("list-chunked");
 	} 
 	
 	/**
