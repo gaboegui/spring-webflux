@@ -30,6 +30,8 @@ public class Product {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date createAt;
 	
+	private Category category;
+	
 	/** Default constructor. */
 	public Product() {
 	}
@@ -43,6 +45,19 @@ public class Product {
 	public Product(String name, Double price) {
 		this.name = name;
 		this.price = price;
+	}
+	
+	public Product(String name, Double price, Category cat) {
+		this(name,price);
+		this.category = cat;
+	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
 	}
 
 	public String getId() {

@@ -95,7 +95,22 @@ public class ProductController {
 		
 		return Mono.just("productForm");
 	}
-
+	
+	@GetMapping("/delete/{id}")
+	public Mono<String> deleteProduct(@PathVariable String id) {
+		
+		return productService.findById(id)
+				.defaultIfEmpty(new Product())
+				.flatMap(prod -> {					// notFound -> Exception
+					if (prod.getId() == null) {   
+						return Mono.error(new InterruptedException("Product not found"));
+					}
+					return Mono.just(prod);
+				})
+				.flatMap(productService::delete)   // perform delete
+					.then(Mono.just("redirect:/list?success=Producto+eliminado")) // replaces Mono<Void>
+				.onErrorResume(ex -> Mono.just("redirect:/list?success=no+existe+Producto")); // handle Exception
+	}
 	
 	@PostMapping("/product-form")
 	public Mono<String> saveForm(@Valid Product product, BindingResult validation, Model model,  SessionStatus session) {
