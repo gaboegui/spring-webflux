@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 public class Category {
 	
 	@Id
+	@NotEmpty
 	private String id;
 	
 	@NotEmpty

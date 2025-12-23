@@ -15,18 +15,28 @@
 	<table>
 		<thead>
 			<tr>
+				<th></th>
 				<th>id</th>
 				<th>nombre</th>
 				<th>precio</th>
 				<th>fecha</th>
+				<th>category</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr th:each="producto: ${products}">
-				<td th:text="${producto.id}"></td>
+				<td style="max-width: 10%;">
+					<!-- /uploads/img/ call a Get Controller  -->
+					<img th:if="${producto.picture != null && #strings.length(producto.picture) > 0}" 
+						th:src="@{/uploads/img/} + ${producto.picture}"      
+						style="max-width: 10%;" />
+				</td>
+				<td th:text="${#strings.abbreviate(producto.id, 10)}"></td>
 				<td th:text="${producto.name}"></td>
+				<!-- "${#numbers.formatCurrency(producto.price)}"-->
 				<td th:text="${producto.price}"></td>
-				<td th:text="${producto.createAt}"></td>
+				<td th:text="${#calendars.format(producto.createAt , 'dd-MM-yyyy' )}"></td>
+				<td th:text="${producto.category.name}"></td>
 				<td><a th:href="@{/product-form/} + ${producto.id}"> Edit</a></td>
 				<td><a th:href="@{/delete/} + ${producto.id}" 
 					onclick="return confirm('Are you sure to Delete');"> Delete</a>
