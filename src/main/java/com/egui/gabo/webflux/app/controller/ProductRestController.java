@@ -23,24 +23,26 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/products")
 public class ProductRestController {
-	
-	private static final Logger log = LoggerFactory.getLogger(ProductRestController.class);	
-	
+
+	private static final Logger log = LoggerFactory.getLogger(ProductRestController.class);
+
 	@Autowired
 	private ProductService productService;
-	
+
 	/**
 	 * Get all products with names converted to uppercase.
 	 * Returns a Flux stream of products.
+	 * 
+	 * @return a Flux of all products
 	 */
 	@GetMapping
 	public Flux<Product> listarProductos() {
 		Flux<Product> products = productService.findAll()
 				.doOnNext(prod -> log.info(prod.getName()));
-		
+
 		return products;
-	} 
-	
+	}
+
 	/**
 	 * Get a single product by ID.
 	 * Returns a Mono containing the product or empty if not found.
@@ -50,15 +52,15 @@ public class ProductRestController {
 	 */
 	@GetMapping("/{id}")
 	public Mono<Product> listarProducto(@PathVariable String id) {
-		
+
 		// Mono<Product> founded = productDao.findById(id);
-		
+
 		Flux<Product> productos = productService.findAllNameUppercase();
 		Mono<Product> founded = productos
 				.filter(prod -> prod.getId().equals(id))
 				.next();
-		
+
 		return founded;
 	}
-	
+
 }

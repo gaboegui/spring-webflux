@@ -12,12 +12,15 @@ import com.egui.gabo.webflux.app.service.ProductService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/**
+ * Implementation of ProductService using ReactiveMongoRepository.
+ */
 @Service
 public class ProductServiceImpl implements ProductService {
-	
+
 	@Autowired
 	private ProductRepository productDao;
-	
+
 	@Autowired
 	private CategorieRepository categorieDao;
 
@@ -25,16 +28,15 @@ public class ProductServiceImpl implements ProductService {
 	public Flux<Product> findAll() {
 		return productDao.findAll();
 	}
-	
+
 	@Override
 	public Flux<Product> findAllNameUppercase() {
 		return productDao.findAll()
 				.map(product -> {
 					product.setName(product.getName().toUpperCase());
 					return product;
-		});
+				});
 	}
-
 
 	@Override
 	public Mono<Product> findById(String id) {
@@ -53,19 +55,19 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public Flux<Category> findAllCategories() {
-		
+
 		return categorieDao.findAll();
 	}
 
 	@Override
 	public Mono<Category> findCategoryById(String id) {
-		
+
 		return categorieDao.findById(id);
 	}
 
 	@Override
 	public Mono<Category> saveCategory(Category c) {
-		
+
 		return categorieDao.save(c);
 	}
 

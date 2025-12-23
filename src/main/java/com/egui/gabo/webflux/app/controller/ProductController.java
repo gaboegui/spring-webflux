@@ -34,7 +34,6 @@ import com.egui.gabo.webflux.app.models.document.Category;
 import com.egui.gabo.webflux.app.models.document.Product;
 import com.egui.gabo.webflux.app.service.ProductService;
 
-
 import jakarta.validation.Valid;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -55,6 +54,11 @@ public class ProductController {
 	private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
 	// @ModelAttribute pass data to Model for use in View
+	/**
+	 * Populates the "categories" model attribute for all views.
+	 * 
+	 * @return a Flux of all available categories
+	 */
 	@ModelAttribute("categories")
 	public Flux<Category> getCategories() {
 		return productService.findAllCategories();
@@ -70,6 +74,9 @@ public class ProductController {
 	/**
 	 * Standard product listing with uppercase names. Uses default Thymeleaf
 	 * subscription to Flux.
+	 * 
+	 * @param model the Spring Model to add attributes to
+	 * @return a Mono<String> resolving to the view name "listProducts"
 	 */
 	@GetMapping("/")
 	public Mono<String> listarProductos(Model model) {
@@ -86,6 +93,9 @@ public class ProductController {
 	/**
 	 * Large dataset demonstration (500x repeated). Tests performance with large
 	 * reactive streams.
+	 * 
+	 * @param model the Spring Model
+	 * @return the view name
 	 */
 	@GetMapping("/list-huge")
 	public Mono<String> listarProductosFull(Model model) {
@@ -97,6 +107,12 @@ public class ProductController {
 		return Mono.just("listProducts");
 	}
 
+	/**
+	 * Displays the form for creating a new product.
+	 * 
+	 * @param model the Spring Model
+	 * @return the view name "productForm"
+	 */
 	@GetMapping("/product-form")
 	public Mono<String> createForm(Model model) {
 
@@ -106,6 +122,13 @@ public class ProductController {
 		return Mono.just("productForm");
 	}
 
+	/**
+	 * Displays the form for editing an existing product.
+	 * 
+	 * @param id    the ID of the product to edit
+	 * @param model the Spring Model
+	 * @return the view name "productForm" populated with the product data
+	 */
 	@GetMapping("/product-form/{id}")
 	public Mono<String> updateForm(@PathVariable String id, Model model) {
 
@@ -119,6 +142,12 @@ public class ProductController {
 		return Mono.just("productForm");
 	}
 
+	/**
+	 * Deletes a product by ID.
+	 * 
+	 * @param id the ID of the product to delete
+	 * @return a Mono resolving to a redirect string
+	 */
 	@GetMapping("/delete/{id}")
 	public Mono<String> deleteProduct(@PathVariable String id) {
 
@@ -131,30 +160,38 @@ public class ProductController {
 				.then(Mono.just("redirect:/list?success=Producto+eliminado")) // replaces Mono<Void>
 				.onErrorResume(ex -> Mono.just("redirect:/list?success=no+existe+Producto")); // handle Exception
 	}
-	
-	
+
+	/**
+	 * Serves uploaded product images.
+	 * 
+	 * @param picName the filename of the picture
+	 * @return a Mono containing the resource response
+	 * @throws MalformedURLException if the path is invalid
+	 */
 	@GetMapping("/uploads/img/{picName:.+}")
-	public Mono<ResponseEntity<Resource>> displayPicture(@PathVariable String picName ) throws MalformedURLException{
-		
+	public Mono<ResponseEntity<Resource>> displayPicture(@PathVariable String picName) throws MalformedURLException {
+
 		Path absolutePath = Paths.get(uploadDirectory).resolve(picName).toAbsolutePath();
-		
+
 		Resource image = new UrlResource(absolutePath.toUri());
-		
+
 		return Mono.just(
 				ResponseEntity.ok()
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + image.getFilename() +"\"")
-					.body(image)
-				);
-		
+						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + image.getFilename() + "\"")
+						.body(image));
+
 	}
+
 	/**
+	 * Processes the product form submission.
 	 * 
-	 * @param product		the hole product from Form
-	 * @param validation	brings errors in Form based on Validation rules on Document/Entity
-	 * @param model
-	 * @param file			defines the file name of the selected picture in Form
-	 * @param session
-	 * @return
+	 * @param product    the full product object from the form
+	 * @param validation binding results containing any validation errors
+	 * @param model      the Spring Model
+	 * @param file       the uploaded file part for the product picture
+	 * @param session    the session status to complete the session attribute
+	 *                   processing
+	 * @return a Mono resolving to the view name or redirect URL
 	 */
 	@PostMapping("/product-form")
 	public Mono<String> saveForm(@Valid Product product, BindingResult validation, Model model,

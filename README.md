@@ -23,7 +23,6 @@ A Spring Boot application demonstrating reactive programming with Spring WebFlux
 - IDE with Spring Boot support (recommended: IntelliJ IDEA or VS Code)
 
 ## Project Structure
-
 ```
 src/main/java/com/egui/gabo/webflux/app/
 ├── SpringWebfluxApplication.java      # Main application class with test data setup
@@ -36,14 +35,17 @@ src/main/java/com/egui/gabo/webflux/app/
 │       └── ProductServiceImpl.java   # Service implementation
 ├── models/
 │   ├── document/
-│   │   └── Product.java              # MongoDB document entity
+│   │   ├── Category.java             # MongoDB document entity for categories
+│   │   └── Product.java              # MongoDB document entity for products
 │   └── repository/
-│       └── ProductRepository.java    # Reactive MongoDB repository
+│       ├── CategorieRepository.java  # Reactive MongoDB repository for categories
+│       └── ProductRepository.java    # Reactive MongoDB repository for products
 src/main/resources/
 ├── application.properties            # Application configuration
 └── templates/
     ├── listProducts.html            # Main product listing template
-    └── list-chunked.html            # Chunked response template
+    ├── list-chunked.html            # Chunked response template
+    └── productForm.html             # Product management form template
 ```
 
 ## Getting Started
@@ -94,17 +96,24 @@ Once running, the application will:
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/` | GET | Standard product listing with uppercase names |
+| `/` | GET | Standard product listing |
 | `/list` | GET | Reactive Data Driver with 2-element chunks and 1-second delays |
 | `/list-huge` | GET | Large dataset (500x repeated) for performance testing |
 | `/list-chunked` | GET | Chunked response with backpressure (1024-byte chunks) |
+| `/product-form` | GET | Display product creation form |
+| `/product-form/{id}` | GET | Display product edit form |
+| `/product-form` | POST | Process product creation/update |
+| `/delete/{id}` | GET | Delete a product |
+| `/uploads/img/{name}`| GET | Retrieve uploaded product image |
 
 ### REST API
 
+Base URL: `/api/products`
+
 | Endpoint | Method | Description | Response |
 |----------|--------|-------------|----------|
-| `/api/products` | GET | Get all products | `Flux<Product>` |
-| `/api/products/{id}` | GET | Get product by ID | `Mono<Product>` |
+| `/` | GET | Get all products (uppercase names) | `Flux<Product>` |
+| `/{id}` | GET | Get product by ID | `Mono<Product>` |
 
 ### Product Model
 ```json

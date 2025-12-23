@@ -5,13 +5,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.NotEmpty;
 
+/**
+ * Represents a product category.
+ * 
+ * @author Gabriel Eguiguren P.
+ */
 @Document(collection = "categories")
 public class Category {
-	
+
 	@Id
 	@NotEmpty
 	private String id;
-	
+
 	@NotEmpty
 	private String name;
 
@@ -31,10 +36,16 @@ public class Category {
 		this.name = name;
 	}
 
+	/**
+	 * Constructor with name.
+	 * 
+	 * @param name Category name
+	 */
 	public Category(@NotEmpty String name) {
 		this.name = name;
 	}
 
+	/** Default constructor. */
 	public Category() {
 	}
 
