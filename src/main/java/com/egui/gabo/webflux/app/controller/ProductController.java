@@ -147,7 +147,15 @@ public class ProductController {
 				);
 		
 	}
-
+	/**
+	 * 
+	 * @param product		the hole product from Form
+	 * @param validation	brings errors in Form based on Validation rules on Document/Entity
+	 * @param model
+	 * @param file			defines the file name of the selected picture in Form
+	 * @param session
+	 * @return
+	 */
 	@PostMapping("/product-form")
 	public Mono<String> saveForm(@Valid Product product, BindingResult validation, Model model,
 			@RequestPart FilePart file, SessionStatus session) {
